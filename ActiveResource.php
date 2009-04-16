@@ -40,7 +40,7 @@
  *
  * ?>
  *
- * @author John Luxford <lux@dojolearning.com>
+ * @author John Luxford <lux@companymachine.com>
  * @version 0.8 beta
  * @license http://opensource.org/licenses/lgpl-2.1.php
  */
