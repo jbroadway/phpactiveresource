@@ -41,7 +41,7 @@
  * ?>
  *
  * @author John Luxford <lux@companymachine.com>
- * @version 0.8 beta
+ * @version 0.9 beta
  * @license http://opensource.org/licenses/lgpl-2.1.php
  */
 class ActiveResource {
@@ -204,15 +204,22 @@ class ActiveResource {
 	 * Simple recursive function to build an XML response.
 	 */
 	function _build_xml ($k, $v) {
-		$res = '<' . $k . '>';
+		if (! is_numeric ($k)) {
+			$res = '<' . $k . '>';
+		}
 		if (is_array ($v)) {
 			foreach ($v as $key => $value) {
 				$res .= $this->_build_xml ($key, $value);
+				if (is_numeric ($key) && $key != array_pop (array_keys ($v))) {
+					$res .= '</' . $k . ">\n<" . $k . '>';
+				}
 			}
 		} else {
 			$res .= $this->_xml_entities ($v);
 		}
-		$res .= '</' . $k . '>';
+		if (! is_numeric ($k)) {
+			$res .= '</' . $k . ">\n";
+		}
 		return $res;
 	}
 
@@ -244,7 +251,7 @@ class ActiveResource {
 			}
 			$params = substr ($params, 1);
 		} elseif ($this->request_format == 'xml') {
-			$params = '<?xml version="1.0" encoding="UTF-8"?><' . $el . '>';
+			$params = '<?xml version="1.0" encoding="UTF-8"?><' . $el . ">\n";
 			foreach ($data as $k => $v) {
 				if ($k != 'id' && $k != 'created-at' && $k != 'updated-at') {
 					$params .= $this->_build_xml ($k, $v);
