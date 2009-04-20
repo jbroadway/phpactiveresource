@@ -204,13 +204,15 @@ class ActiveResource {
 	 * Simple recursive function to build an XML response.
 	 */
 	function _build_xml ($k, $v) {
+		$res = '';
 		if (! is_numeric ($k)) {
 			$res = '<' . $k . '>';
 		}
 		if (is_array ($v)) {
 			foreach ($v as $key => $value) {
 				$res .= $this->_build_xml ($key, $value);
-				if (is_numeric ($key) && $key != array_pop (array_keys ($v))) {
+				$keys = array_keys ($v);
+				if (is_numeric ($key) && $key != array_pop ($keys)) {
 					$res .= '</' . $k . ">\n<" . $k . '>';
 				}
 			}
@@ -228,7 +230,7 @@ class ActiveResource {
 	 * From php.net/htmlentities comments, user "webwurst at web dot de"
 	 */
 	function _xml_entities ($string) {
-		$trans = get_html_translation_table (HTML_ENTITIES, $quote_style);
+		$trans = get_html_translation_table (HTML_ENTITIES);
 	
 		foreach ($trans as $key => $value) {
 			$trans[$key] = '&#' . ord ($key) . ';';
