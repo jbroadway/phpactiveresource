@@ -41,7 +41,7 @@
  * ?>
  *
  * @author John Luxford <lux@companymachine.com>
- * @version 0.9 beta
+ * @version 0.10 beta
  * @license http://opensource.org/licenses/lgpl-2.1.php
  */
 class ActiveResource {
@@ -205,11 +205,16 @@ class ActiveResource {
 	 */
 	function _build_xml ($k, $v) {
 		$res = '';
+		$attrs = '';
 		if (! is_numeric ($k)) {
-			$res = '<' . $k . '>';
+			$res = '<' . $k . '{{attributes}}>';
 		}
 		if (is_array ($v)) {
 			foreach ($v as $key => $value) {
+				if (strpos ($key, '@') === 0) {
+					$attrs .= ' ' . substr ($key, 1) . '="' . $this->_xml_entities ($value) . '"';
+					continue;
+				}
 				$res .= $this->_build_xml ($key, $value);
 				$keys = array_keys ($v);
 				if (is_numeric ($key) && $key != array_pop ($keys)) {
@@ -222,6 +227,7 @@ class ActiveResource {
 		if (! is_numeric ($k)) {
 			$res .= '</' . $k . ">\n";
 		}
+		$res = str_replace ('<' . $k . '{{attributes}}>', '<' . $k . $attrs . '>', $res);
 		return $res;
 	}
 
