@@ -41,7 +41,7 @@
  * ?>
  *
  * @author John Luxford <lux@companymachine.com>
- * @version 0.10 beta
+ * @version 0.11 beta
  * @license http://opensource.org/licenses/lgpl-2.1.php
  */
 class ActiveResource {
@@ -204,6 +204,9 @@ class ActiveResource {
 	 * Simple recursive function to build an XML response.
 	 */
 	function _build_xml ($k, $v) {
+		if (is_object ($v) && strtolower (get_class ($v)) == 'simplexmlelement') {
+			return preg_replace ('/<\?xml(.*?)\?>/', '', $v->asXML ());
+		}
 		$res = '';
 		$attrs = '';
 		if (! is_numeric ($k)) {
