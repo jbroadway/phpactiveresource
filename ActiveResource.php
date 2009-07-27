@@ -51,6 +51,16 @@ class ActiveResource {
 	var $site = false;
 
 	/**
+	 * HTTP Basic Authentication user
+	 */
+	var $user = null;
+
+	/**
+	 * HTTP Basic Authentication password
+	 */	
+	var $password = null;
+	
+	/**
 	 * The remote collection, e.g., person or things
 	 */
 	var $element_name = false;
@@ -110,7 +120,16 @@ class ActiveResource {
 	 */
 	function __construct ($data = array ()) {
 		$this->_data = $data;
-		$this->element_name = strtolower (get_class ($this)) . 's';
+		// Allow class-defined element name or use class name if not defined
+		$this->element_name = ($this->element_name ? $this->element_name . 's' : strtolower (get_class ($this)) . 's');
+
+		// if configuration file (config.ini.php) exists use it (overwrite class properties/attribute values).
+		$config_file_path = dirname (__FILE__) . '/' . 'config.ini.php';
+		if (file_exists ($config_file_path)) {
+			$properties = parse_ini_file ($config_file_path);
+			foreach ($properties as $property => $value )
+				$this->{$property} = $value;
+		}
 	}
 
 	/**
@@ -141,12 +160,16 @@ class ActiveResource {
 	 * GET /collection/id.xml
 	 * GET /collection.xml
 	 */
-	function find ($id = false) {
+	function find ($id = false, $options = array ()) {
 		if (! $id) {
 			$id = $this->_data['id'];
 		}
 		if ($id == 'all') {
-			return $this->_send_and_receive ($this->site . $this->element_name . '.xml', 'GET');
+			$url = $this->site . $this->element_name . '.xml';
+			if (count ($options) > 0) {
+				$url .= '?' . http_build_query ($options);
+			}
+			return $this->_send_and_receive ($url, 'GET');
 		}
 		return $this->_send_and_receive ($this->site . $this->element_name . '/' . $id . '.xml', 'GET');
 	}
@@ -348,6 +371,12 @@ class ActiveResource {
 		curl_setopt ($ch, CURLOPT_CONNECTTIMEOUT, 10);
 		curl_setopt ($ch, CURLOPT_SSL_VERIFYPEER, 0);
 		curl_setopt ($ch, CURLOPT_SSL_VERIFYHOST, 0);
+
+		/* HTTP Basic Authentication */
+		if ($this->user && $this->password) {
+			curl_setopt ($ch, CURLOPT_USERPWD, $this->user . ":" . $this->password);	
+		}
+
 		if ($this->request_format == 'xml') {
 			curl_setopt ($ch, CURLOPT_HTTPHEADER, array ("Content-Type: text/xml", "Length: " . strlen ($params)));
 		}
@@ -370,6 +399,16 @@ class ActiveResource {
 				break;
 		}
 		$res = curl_exec ($ch);
+
+		// Check HTTP status code for denied access
+		$http_code = curl_getinfo ($ch, CURLINFO_HTTP_CODE);
+		if ($http_code == 401) {
+			$this->errno = $http_code;
+			$this->error = "HTTP Basic: Access denied.";
+			curl_close ($ch);
+			return false;
+		}
+
 		if (! $res) {
 			$this->errno = curl_errno ($ch);
 			$this->error = curl_error ($ch);
