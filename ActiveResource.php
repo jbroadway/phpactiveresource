@@ -41,7 +41,7 @@
  * ?>
  *
  * @author John Luxford <lux@companymachine.com>
- * @version 0.12 beta
+ * @version 0.13 beta
  * @license http://opensource.org/licenses/lgpl-2.1.php
  */
 class ActiveResource {
@@ -116,12 +116,38 @@ class ActiveResource {
 	var $request_format = 'url';
 
 	/**
+	 * Corrections to improper pleuralizations.
+	 */
+	var $pleural_corrections = array (
+		'persons' => 'people',
+		'peoples' => 'people',
+		'mans' => 'men',
+		'mens' => 'men',
+		'womans' => 'women',
+		'womens' => 'women',
+		'childs' => 'children',
+		'childrens' => 'children',
+		'sheeps' => 'sheep',
+		'octopuses' => 'octopi',
+		'quizs' => 'quizzes',
+		'axises' => 'axes',
+		'buffalos' => 'buffaloes',
+		'tomatos' => 'tomatoes',
+		'potatos' => 'potatoes',
+		'oxes' => 'oxen',
+		'mouses' => 'mice',
+		'matrixes' => 'matrices',
+		'vertexes' => 'vertices',
+		'indexes' => 'indices',
+	);
+
+	/**
 	 * Constructor method.
 	 */
 	function __construct ($data = array ()) {
 		$this->_data = $data;
 		// Allow class-defined element name or use class name if not defined
-		$this->element_name = ($this->element_name ? $this->element_name . 's' : strtolower (get_class ($this)) . 's');
+		$this->element_name = ($this->element_name ? $this->pleuralize ($this->element_name) : $this->pleuralize (strtolower (get_class ($this))));
 
 		// if configuration file (config.ini.php) exists use it (overwrite class properties/attribute values).
 		$config_file_path = dirname (__FILE__) . '/' . 'config.ini.php';
@@ -130,6 +156,23 @@ class ActiveResource {
 			foreach ($properties as $property => $value )
 				$this->{$property} = $value;
 		}
+	}
+
+	/**
+	 * Pleuralize the element name.
+	 */
+	function pleuralize ($word) {
+		$word .= 's';
+		$word = preg_replace ('/(x|ch|sh|ss])s$/', '\1es', $word);
+		$word = preg_replace ('/ss$/', 'ses', $word);
+		$word = preg_replace ('/([ti])ums$/', '\1a', $word);
+		$word = preg_replace ('/sises$/', 'ses', $word);
+		$word = preg_replace ('/([^aeiouy]|qu)ys$/', '\1ies', $word);
+		$word = preg_replace ('/(?:([^f])fe|([lr])f)s$/', '\1\2ves', $word);
+		if (isset ($this->pleural_corrections[$word])) {
+			return $this->pleural_corrections[$word];
+		}
+		return $word;
 	}
 
 	/**
@@ -299,20 +342,23 @@ class ActiveResource {
 
 		$res = $this->_fetch ($url, $method, $params);
 
-		list ($headers, $res) = explode ("\r\n\r\n", $res, 2);
-		$this->response_headers = $headers;
-		$this->response_body = $res;
-		if (preg_match ('/HTTP\/[0-9]\.[0-9] ([0-9]+)/', $headers, $regs)) {
-			$this->response_code = $regs[1];
-		} else {
-			$this->response_code = false;
-		}
+		// Keep splitting off any top headers until we get to the (XML) body:
+		while (strpos($res, "HTTP/") === 0) {
+			list ($headers, $res) = explode ("\r\n\r\n", $res, 2);
+			$this->response_headers = $headers;
+			$this->response_body = $res;
+			if (preg_match ('/HTTP\/[0-9]\.[0-9] ([0-9]+)/', $headers, $regs)) {
+				$this->response_code = $regs[1];
+			} else {
+				$this->response_code = false;
+			}
 
-		if (! $res) {
-			return $this;
-		} elseif ($res == ' ') {
-			$this->error = 'Empty reply';
-			return $this;
+			if (! $res) {
+				return $this;
+			} elseif ($res == ' ') {
+				$this->error = 'Empty reply';
+				return $this;
+			}
 		}
 
 		// parse XML response
@@ -454,5 +500,47 @@ class ActiveResource {
 		return $this;
 	}
 }
+
+/** TODO: Replace with a proper set of tests.
+
+class Test extends ActiveResource {}
+
+$t = new Test;
+
+echo $t->pleuralize ('person') . "\n";
+echo $t->pleuralize ('people') . "\n";
+echo $t->pleuralize ('man') . "\n";
+echo $t->pleuralize ('woman') . "\n";
+echo $t->pleuralize ('women') . "\n";
+echo $t->pleuralize ('child') . "\n";
+echo $t->pleuralize ('sheep') . "\n";
+echo $t->pleuralize ('octopus') . "\n";
+echo $t->pleuralize ('virus') . "\n";
+echo $t->pleuralize ('quiz') . "\n";
+echo $t->pleuralize ('axis') . "\n";
+echo $t->pleuralize ('axe') . "\n";
+echo $t->pleuralize ('buffalo') . "\n";
+echo $t->pleuralize ('tomato') . "\n";
+echo $t->pleuralize ('potato') . "\n";
+echo $t->pleuralize ('ox') . "\n";
+echo $t->pleuralize ('mouse') . "\n";
+echo $t->pleuralize ('matrix') . "\n";
+echo $t->pleuralize ('vertex') . "\n";
+echo $t->pleuralize ('vortex') . "\n";
+echo $t->pleuralize ('index') . "\n";
+echo $t->pleuralize ('sandwich') . "\n";
+echo $t->pleuralize ('mass') . "\n";
+echo $t->pleuralize ('fax') . "\n";
+echo $t->pleuralize ('pin') . "\n";
+echo $t->pleuralize ('touch') . "\n";
+echo $t->pleuralize ('sash') . "\n";
+echo $t->pleuralize ('bromium') . "\n";
+echo $t->pleuralize ('prophecy') . "\n";
+echo $t->pleuralize ('crisis') . "\n";
+echo $t->pleuralize ('life') . "\n";
+echo $t->pleuralize ('wife') . "\n";
+echo $t->pleuralize ('song') . "\n";
+
+*/
 
 ?>
