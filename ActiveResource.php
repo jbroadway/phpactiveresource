@@ -41,7 +41,7 @@
  * ?>
  *
  * @author John Luxford <lux@companymachine.com>
- * @version 0.13 beta
+ * @version 0.14 beta
  * @license http://opensource.org/licenses/lgpl-2.1.php
  */
 class ActiveResource {
