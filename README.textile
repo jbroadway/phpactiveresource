@@ -41,3 +41,19 @@ $songs = $song->get ('by_year', array ('year' => 1999));
 
 ?>
 </pre>
+
+h2. Extra URL params
+
+If you want to add extra params to the end of the url eg: an API key, you can set $extra_params
+
+<pre>
+<?php
+
+require_once ('ActiveResource.php');
+
+class Song extends ActiveResource {
+    var $site = 'http://localhost:3000/';
+    var $element_name = 'songs';
+    var $extra_params = '?key=123456789';
+}
+</pre>

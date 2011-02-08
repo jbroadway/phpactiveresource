@@ -51,6 +51,11 @@ class ActiveResource {
 	var $site = false;
 
 	/**
+	 * Add any extra params to the end of the url eg: API key
+	 */
+	var $extra_params = false;
+
+	/**
 	 * HTTP Basic Authentication user
 	 */
 	var $user = null;
@@ -148,6 +153,13 @@ class ActiveResource {
 		$this->_data = $data;
 		// Allow class-defined element name or use class name if not defined
 		$this->element_name = ($this->element_name ? $this->pleuralize ($this->element_name) : $this->pleuralize (strtolower (get_class ($this))));
+
+		// Detect for namespaces, and take just the class name
+		if (stripos($this->element_name, '\\'))
+		{
+			$classItems = explode('\\', $this->element_name);
+			$this->element_name = end($classItems);
+		}
 
 		// if configuration file (config.ini.php) exists use it (overwrite class properties/attribute values).
 		$config_file_path = dirname (__FILE__) . '/' . 'config.ini.php';
@@ -336,11 +348,22 @@ class ActiveResource {
 			}
 			$params .= '</' . $el . '>';
 		}
+
+		if ($this->extra_params !== false)
+		{
+			$url = $url . $this->extra_params;
+		}
+
 		$this->request_body = $params;
 		$this->request_uri = $url;
 		$this->request_method = $method;
 
 		$res = $this->_fetch ($url, $method, $params);
+
+		if ($res === false)
+		{
+			return $this;
+		}
 
 		// Keep splitting off any top headers until we get to the (XML) body:
 		while (strpos($res, "HTTP/") === 0) {
@@ -407,6 +430,7 @@ class ActiveResource {
 			$this->error = 'cURL extension not loaded.';
 			return false;
 		}
+
 		$ch = curl_init ();
 		curl_setopt ($ch, CURLOPT_URL, $url);
 		curl_setopt ($ch, CURLOPT_MAXREDIRS, 3);
