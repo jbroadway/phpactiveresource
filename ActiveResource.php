@@ -152,7 +152,7 @@ class ActiveResource {
 	function __construct ($data = array ()) {
 		$this->_data = $data;
 		// Allow class-defined element name or use class name if not defined
-		$this->element_name = ($this->element_name ? $this->pleuralize ($this->element_name) : $this->pleuralize (strtolower (get_class ($this))));
+		$this->element_name = ($this->element_name ? $this->pluralize ($this->element_name) : $this->pluralize (strtolower (get_class ($this))));
 
 		// Detect for namespaces, and take just the class name
 		if (stripos($this->element_name, '\\'))
@@ -171,9 +171,9 @@ class ActiveResource {
 	}
 
 	/**
-	 * Pleuralize the element name.
+	 * Pluralize the element name.
 	 */
-	function pleuralize ($word) {
+	function pluralize ($word) {
 		$word .= 's';
 		$word = preg_replace ('/(x|ch|sh|ss])s$/', '\1es', $word);
 		$word = preg_replace ('/ss$/', 'ses', $word);
@@ -185,6 +185,13 @@ class ActiveResource {
 			return $this->pleural_corrections[$word];
 		}
 		return $word;
+	}
+
+	/**
+	 * For backwards-compatibility.
+	 */
+	function pleuralize ($word) {
+		return $this->pluralize ($word);
 	}
 
 	/**
@@ -531,39 +538,39 @@ class Test extends ActiveResource {}
 
 $t = new Test;
 
-echo $t->pleuralize ('person') . "\n";
-echo $t->pleuralize ('people') . "\n";
-echo $t->pleuralize ('man') . "\n";
-echo $t->pleuralize ('woman') . "\n";
-echo $t->pleuralize ('women') . "\n";
-echo $t->pleuralize ('child') . "\n";
-echo $t->pleuralize ('sheep') . "\n";
-echo $t->pleuralize ('octopus') . "\n";
-echo $t->pleuralize ('virus') . "\n";
-echo $t->pleuralize ('quiz') . "\n";
-echo $t->pleuralize ('axis') . "\n";
-echo $t->pleuralize ('axe') . "\n";
-echo $t->pleuralize ('buffalo') . "\n";
-echo $t->pleuralize ('tomato') . "\n";
-echo $t->pleuralize ('potato') . "\n";
-echo $t->pleuralize ('ox') . "\n";
-echo $t->pleuralize ('mouse') . "\n";
-echo $t->pleuralize ('matrix') . "\n";
-echo $t->pleuralize ('vertex') . "\n";
-echo $t->pleuralize ('vortex') . "\n";
-echo $t->pleuralize ('index') . "\n";
-echo $t->pleuralize ('sandwich') . "\n";
-echo $t->pleuralize ('mass') . "\n";
-echo $t->pleuralize ('fax') . "\n";
-echo $t->pleuralize ('pin') . "\n";
-echo $t->pleuralize ('touch') . "\n";
-echo $t->pleuralize ('sash') . "\n";
-echo $t->pleuralize ('bromium') . "\n";
-echo $t->pleuralize ('prophecy') . "\n";
-echo $t->pleuralize ('crisis') . "\n";
-echo $t->pleuralize ('life') . "\n";
-echo $t->pleuralize ('wife') . "\n";
-echo $t->pleuralize ('song') . "\n";
+echo $t->pluralize ('person') . "\n";
+echo $t->pluralize ('people') . "\n";
+echo $t->pluralize ('man') . "\n";
+echo $t->pluralize ('woman') . "\n";
+echo $t->pluralize ('women') . "\n";
+echo $t->pluralize ('child') . "\n";
+echo $t->pluralize ('sheep') . "\n";
+echo $t->pluralize ('octopus') . "\n";
+echo $t->pluralize ('virus') . "\n";
+echo $t->pluralize ('quiz') . "\n";
+echo $t->pluralize ('axis') . "\n";
+echo $t->pluralize ('axe') . "\n";
+echo $t->pluralize ('buffalo') . "\n";
+echo $t->pluralize ('tomato') . "\n";
+echo $t->pluralize ('potato') . "\n";
+echo $t->pluralize ('ox') . "\n";
+echo $t->pluralize ('mouse') . "\n";
+echo $t->pluralize ('matrix') . "\n";
+echo $t->pluralize ('vertex') . "\n";
+echo $t->pluralize ('vortex') . "\n";
+echo $t->pluralize ('index') . "\n";
+echo $t->pluralize ('sandwich') . "\n";
+echo $t->pluralize ('mass') . "\n";
+echo $t->pluralize ('fax') . "\n";
+echo $t->pluralize ('pin') . "\n";
+echo $t->pluralize ('touch') . "\n";
+echo $t->pluralize ('sash') . "\n";
+echo $t->pluralize ('bromium') . "\n";
+echo $t->pluralize ('prophecy') . "\n";
+echo $t->pluralize ('crisis') . "\n";
+echo $t->pluralize ('life') . "\n";
+echo $t->pluralize ('wife') . "\n";
+echo $t->pluralize ('song') . "\n";
 
 */
 
