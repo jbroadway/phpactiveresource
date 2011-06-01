@@ -290,7 +290,7 @@ class ActiveResource {
 	 */
 	function _build_xml ($k, $v) {
 		if (is_object ($v) && strtolower (get_class ($v)) == 'simplexmlelement') {
-			return preg_replace ('/<\?xml(.*?)\?>/', '', $v->asXML ());
+			return preg_replace ('/<\?xml(.*?)\?>\n*/', '', $v->asXML ());
 		}
 		$res = '';
 		$attrs = '';
@@ -531,47 +531,5 @@ class ActiveResource {
 		return $this;
 	}
 }
-
-/** TODO: Replace with a proper set of tests.
-
-class Test extends ActiveResource {}
-
-$t = new Test;
-
-echo $t->pluralize ('person') . "\n";
-echo $t->pluralize ('people') . "\n";
-echo $t->pluralize ('man') . "\n";
-echo $t->pluralize ('woman') . "\n";
-echo $t->pluralize ('women') . "\n";
-echo $t->pluralize ('child') . "\n";
-echo $t->pluralize ('sheep') . "\n";
-echo $t->pluralize ('octopus') . "\n";
-echo $t->pluralize ('virus') . "\n";
-echo $t->pluralize ('quiz') . "\n";
-echo $t->pluralize ('axis') . "\n";
-echo $t->pluralize ('axe') . "\n";
-echo $t->pluralize ('buffalo') . "\n";
-echo $t->pluralize ('tomato') . "\n";
-echo $t->pluralize ('potato') . "\n";
-echo $t->pluralize ('ox') . "\n";
-echo $t->pluralize ('mouse') . "\n";
-echo $t->pluralize ('matrix') . "\n";
-echo $t->pluralize ('vertex') . "\n";
-echo $t->pluralize ('vortex') . "\n";
-echo $t->pluralize ('index') . "\n";
-echo $t->pluralize ('sandwich') . "\n";
-echo $t->pluralize ('mass') . "\n";
-echo $t->pluralize ('fax') . "\n";
-echo $t->pluralize ('pin') . "\n";
-echo $t->pluralize ('touch') . "\n";
-echo $t->pluralize ('sash') . "\n";
-echo $t->pluralize ('bromium') . "\n";
-echo $t->pluralize ('prophecy') . "\n";
-echo $t->pluralize ('crisis') . "\n";
-echo $t->pluralize ('life') . "\n";
-echo $t->pluralize ('wife') . "\n";
-echo $t->pluralize ('song') . "\n";
-
-*/
 
 ?>
