@@ -13,7 +13,7 @@ class ActiveResourceTest extends PHPUnit_Framework_TestCase {
 		$t->foo = 'asdf';
 		$this->assertEquals ($t->foo, 'asdf');
 		$this->assertEquals ($t->_data, array ('foo' => 'asdf'));
-		$this->assertEquals ($t->element_name, 'tests');
+		$this->assertEquals ($t->element_name_plural, 'tests');
 	}
 
 	function test_build_xml () {
@@ -66,6 +66,11 @@ class ActiveResourceTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals ($t->pluralize ('life'), 'lives');
 		$this->assertEquals ($t->pluralize ('wife'), 'wives');
 		$this->assertEquals ($t->pluralize ('song'), 'songs');
+		$this->assertEquals ($t->pluralize ('try'), 'tries');
+		$this->assertEquals ($t->pluralize ('tree'), 'trees');
+		$this->assertEquals ($t->pluralize ('tries'), 'tries');
+		$this->assertEquals ($t->pluralize ('entry'), 'entries');
+		$this->assertEquals ($t->pluralize ('entries'), 'entries');
 	}
 }
 
