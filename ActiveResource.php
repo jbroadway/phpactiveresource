@@ -455,7 +455,7 @@ class ActiveResource {
 		}
 
 		if ($this->request_format == 'xml') {
-			curl_setopt ($ch, CURLOPT_HTTPHEADER, array ("Content-Type: text/xml", "Length: " . strlen ($params)));
+			curl_setopt ($ch, CURLOPT_HTTPHEADER, array ("Expect:", "Content-Type: text/xml", "Length: " . strlen ($params)));
 		}
 		switch ($method) {
 			case 'POST':
