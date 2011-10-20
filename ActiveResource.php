@@ -531,8 +531,8 @@ class ActiveResource {
 
 		// parse XML response
 		$xml = new SimpleXMLElement ($res);
-
-		if ($xml->getName () == $this->element_name_plural) {
+		// normalize xml element name in case rails ressource contains an underscore
+		if (str_replace("-","_", $xml->getName ()) == $this->element_name_plural) {
 			// multiple
 			$res = array ();
 			$cls = get_class ($this);
