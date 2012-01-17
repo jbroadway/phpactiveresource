@@ -1,5 +1,7 @@
 h1. PHP ActiveResource
 
+<a href='http://www.pledgie.com/campaigns/4020'><img alt='Click here to lend your support to: phpactiveresource and make a donation at www.pledgie.com !' src='http://www.pledgie.com/campaigns/4020.png?skin_name=chrome' border='0' /></a>
+
 This is a basic PHP class for accessing Ruby on Rails REST APIs in an ActiveResource style of coding. The benefit is easier use of RoR-based REST services without having to roll your own CURL-based client each time. Hopefully this class saves a few people some time coding in PHP against RoR-based REST services. It's by no means an exhaustive port, and some methods are missing, but it does try to cover all the basics.
 
 Note:  You will need the php curl extension installed on your system. On Ubuntu, you can install them with:
