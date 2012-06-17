@@ -251,7 +251,7 @@ class ActiveResource {
 	 */
 	function get ($method, $options = array ()) {
 		$req = $this->site . $this->element_name_plural;
-        if ($this->_data['id']) { 
+        if (isset($this->_data['id']) && $this->_data['id']) { 
           $req .= '/' . $this->_data['id'];
         }
         $req .= '/' . $method . '.xml';
@@ -266,13 +266,13 @@ class ActiveResource {
 	 *
 	 * POST /collection/id/method.xml
 	 */
-	function post ($method, $options = array ()) {
+	function post ($method, $options = array (), $start_tag=FALSE) {
 		$req = $this->site . $this->element_name_plural;
         if ($this->_data['id']) {
           $req .= '/' . $this->_data['id'];
         }
         $req .= '/' . $method . '.xml';
-		return $this->_send_and_receive ($req, 'POST', $options);
+		return $this->_send_and_receive ($req, 'POST', $options, $start_tag);
 	}
 
 	/**
@@ -280,12 +280,15 @@ class ActiveResource {
 	 *
 	 * PUT /collection/id/method.xml
 	 */
-	function put ($method, $options = array ()) {
+	function put ($method, $options = array (), $options_as_xml=FALSE, $start_tag=FALSE) {
 		$req = $this->site . $this->element_name_plural;
         if ($this->_data['id']) { 
           $req .= '/' . $this->_data['id'];
         }
         $req .= '/' . $method . '.xml';
+		if ($options_as_xml) {
+		  return $this->_send_and_receive ($req, 'PUT', $options, $start_tag);
+		}
 		if (count ($options) > 0) {
 			$req .= '?' . http_build_query ($options);
 		}
@@ -413,6 +416,7 @@ class ActiveResource {
 			// just return it
 			return $s;
 		}
+		$s = (string)$s;
 		
 		// create the return string
 		$r = '';
@@ -424,7 +428,7 @@ class ActiveResource {
 			// get the value of the character
 			$o = $this->_unicode_ord($s, $i);
 			
-			// valid cahracters
+			// valid characters
 			$v = (
 				// \t \n <vertical tab> <form feed> \r
 				($o >= 9 && $o <= 13) || 
@@ -493,9 +497,9 @@ class ActiveResource {
 	/**
 	 * Build the request, call _fetch() and parse the results.
 	 */
-	function _send_and_receive ($url, $method, $data = array ()) {
+	function _send_and_receive ($url, $method, $data = array (), $start_tag=FALSE) {
 		$params = '';
-		$el = $this->element_name; // Singular this time
+		$el = $start_tag ? $start_tag : $this->element_name; // Singular this time
 		if ($this->request_format == 'url') {
 			foreach ($data as $k => $v) {
 				if ($k != 'id' && $k != 'created-at' && $k != 'updated-at') {
@@ -512,18 +516,14 @@ class ActiveResource {
 			}
 			$params .= '</' . $el . '>';
 		}
-
 		if ($this->extra_params !== false)
 		{
 			$url = $url . $this->extra_params;
 		}
-
 		$this->request_body = $params;
 		$this->request_uri = $url;
 		$this->request_method = $method;
-
 		$res = $this->_fetch ($url, $method, $params);
-
 		if ($res === false)
 		{
 			return $this;
