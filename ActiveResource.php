@@ -233,14 +233,15 @@ class ActiveResource {
 		if (! $id) {
 			$id = $this->_data['id'];
 		}
+		$options_string = '';
+		if (count($options) > 0) {
+			$options_string = '?' . http_build_query ($options);
+		}
 		if ($id == 'all') {
 			$url = $this->site . $this->element_name_plural . '.xml';
-			if (count ($options) > 0) {
-				$url .= '?' . http_build_query ($options);
-			}
-			return $this->_send_and_receive ($url, 'GET');
+			return $this->_send_and_receive ($url . $options_string, 'GET');
 		}
-		return $this->_send_and_receive ($this->site . $this->element_name_plural . '/' . $id . '.xml', 'GET');
+		return $this->_send_and_receive ($this->site . $this->element_name_plural . '/' . $id . '.xml' . $options_string, 'GET');
 	}
 
 	/**
