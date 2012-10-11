@@ -7,38 +7,38 @@
  *
  * Usage:
  *
- * <?php
- *
- * require_once ('ActiveResource.php');
- *
- * class Song extends ActiveResource {
- *     var $site = 'http://localhost:3000/';
- *     var $element_name = 'songs';
- * }
- *
- * // create new item
- * $song = new Song (array ('artist' => 'Joe Cocker', 'title' => 'A Little Help From My Friends'));
- * $song->save ();
- *
- * // fetch and update an item
- * $song->find (44)->set ('title', 'The River')->save ();
- *
- * // line by line
- * $song->find (44);
- * $song->title = 'The River';
- * $song->save ();
- *
- * // get all songs
- * $songs = $song->find ('all');
- *
- * // delete a song
- * $song->find (44);
- * $song->destroy ();
- *
- * // custom method
- * $songs = $song->get ('by_year', array ('year' => 1999));
- *
- * ?>
+ *     <?php
+ *     
+ *     require_once ('ActiveResource.php');
+ *     
+ *     class Song extends ActiveResource {
+ *         var $site = 'http://localhost:3000/';
+ *         var $element_name = 'songs';
+ *     }
+ *     
+ *     // create new item
+ *     $song = new Song (array ('artist' => 'Joe Cocker', 'title' => 'A Little Help From My Friends'));
+ *     $song->save ();
+ *     
+ *     // fetch and update an item
+ *     $song->find (44)->set ('title', 'The River')->save ();
+ *     
+ *     // line by line
+ *     $song->find (44);
+ *     $song->title = 'The River';
+ *     $song->save ();
+ *     
+ *     // get all songs
+ *     $songs = $song->find ('all');
+ *     
+ *     // delete a song
+ *     $song->find (44);
+ *     $song->destroy ();
+ *     
+ *     // custom method
+ *     $songs = $song->get ('by_year', array ('year' => 1999));
+ *     
+ *     ?>
  *
  * @author John Luxford <lux@companymachine.com>
  * @version 0.14 beta
@@ -165,10 +165,9 @@ class ActiveResource {
 		$this->element_name = $this->element_name ? $this->element_name : strtolower (get_class ($this));
 
 		// Detect for namespaces, and take just the class name
-		if (stripos($this->element_name, '\\'))
-		{
-			$classItems = explode('\\', $this->element_name);
-			$this->element_name = end($classItems);
+		if (stripos ($this->element_name, '\\')) {
+			$classItems = explode ('\\', $this->element_name);
+			$this->element_name = end ($classItems);
 		}
 
 		// Get the plural name after removing namespaces
@@ -211,8 +210,8 @@ class ActiveResource {
 	/**
 	 * Saves a new record or updates an existing one via:
 	 *
-	 * POST /collection.xml
-	 * PUT  /collection/id.xml
+	 *     POST /collection.xml
+	 *     PUT  /collection/id.xml
 	 */
 	function save () {
 		if (isset ($this->_data['id'])) {
@@ -224,7 +223,7 @@ class ActiveResource {
 	/**
 	 * Deletes a record via:
 	 *
-	 * DELETE /collection/id.xml
+	 *     DELETE /collection/id.xml
 	 */
 	function destroy () {
 		return $this->_send_and_receive ($this->site . $this->element_name_plural . '/' . $this->_data['id'] . '.xml', 'DELETE');
@@ -233,15 +232,15 @@ class ActiveResource {
 	/**
 	 * Finds a record or records via:
 	 *
-	 * GET /collection/id.xml
-	 * GET /collection.xml
+	 *     GET /collection/id.xml
+	 *     GET /collection.xml
 	 */
 	function find ($id = false, $options = array ()) {
 		if (! $id) {
 			$id = $this->_data['id'];
 		}
 		$options_string = '';
-		if (count($options) > 0) {
+		if (count ($options) > 0) {
 			$options_string = '?' . http_build_query ($options);
 		}
 		if ($id == 'all') {
@@ -254,12 +253,12 @@ class ActiveResource {
 	/**
 	 * Gets a specified custom method on the current object via:
 	 *
-	 * GET /collection/id/method.xml
-	 * GET /collection/id/method.xml?attr=value
+	 *     GET /collection/id/method.xml
+	 *     GET /collection/id/method.xml?attr=value
 	 */
 	function get ($method, $options = array ()) {
 		$req = $this->site . $this->element_name_plural;
-        if (isset($this->_data['id']) && $this->_data['id']) { 
+        if (isset ($this->_data['id']) && $this->_data['id']) { 
           $req .= '/' . $this->_data['id'];
         }
         $req .= '/' . $method . '.xml';
@@ -272,9 +271,9 @@ class ActiveResource {
 	/**
 	 * Posts to a specified custom method on the current object via:
 	 *
-	 * POST /collection/id/method.xml
+	 *     POST /collection/id/method.xml
 	 */
-	function post ($method, $options = array (), $start_tag=FALSE) {
+	function post ($method, $options = array (), $start_tag = false) {
 		$req = $this->site . $this->element_name_plural;
         if ($this->_data['id']) {
           $req .= '/' . $this->_data['id'];
@@ -286,16 +285,16 @@ class ActiveResource {
 	/**
 	 * Puts to a specified custom method on the current object via:
 	 *
-	 * PUT /collection/id/method.xml
+	 *     PUT /collection/id/method.xml
 	 */
-	function put ($method, $options = array (), $options_as_xml=FALSE, $start_tag=FALSE) {
+	function put ($method, $options = array (), $options_as_xml = false, $start_tag = false) {
 		$req = $this->site . $this->element_name_plural;
         if ($this->_data['id']) { 
-          $req .= '/' . $this->_data['id'];
+        	$req .= '/' . $this->_data['id'];
         }
         $req .= '/' . $method . '.xml';
 		if ($options_as_xml) {
-		  return $this->_send_and_receive ($req, 'PUT', $options, $start_tag);
+			return $this->_send_and_receive ($req, 'PUT', $options, $start_tag);
 		}
 		if (count ($options) > 0) {
 			$req .= '?' . http_build_query ($options);
@@ -366,7 +365,7 @@ class ActiveResource {
 	 * @author Dom Hastings - modified to suit my needs
 	 * @see http://www.php.net/manual/en/function.ord.php#78032
 	 */
-	function _unicode_ord(&$c, &$i = 0) {
+	function _unicode_ord (&$c, &$i = 0) {
 		// get the character length
 		$l = strlen($c);
 		// copy the offset
@@ -424,7 +423,7 @@ class ActiveResource {
 			// just return it
 			return $s;
 		}
-		$s = (string)$s;
+		$s = (string) $s;
 		
 		// create the return string
 		$r = '';
@@ -505,7 +504,7 @@ class ActiveResource {
 	/**
 	 * Build the request, call _fetch() and parse the results.
 	 */
-	function _send_and_receive ($url, $method, $data = array (), $start_tag=FALSE) {
+	function _send_and_receive ($url, $method, $data = array (), $start_tag = false) {
 		$params = '';
 		$el = $start_tag ? $start_tag : $this->element_name; // Singular this time
 		if ($this->request_format == 'url') {
@@ -560,8 +559,9 @@ class ActiveResource {
 
 		// parse XML response
 		$xml = new SimpleXMLElement ($res);
+
 		// normalize xml element name in case rails ressource contains an underscore
-		if (str_replace("-","_", $xml->getName ()) == $this->element_name_plural) {
+		if (str_replace ('-', '_', $xml->getName ()) == $this->element_name_plural) {
 			// multiple
 			$res = array ();
 			$cls = get_class ($this);
