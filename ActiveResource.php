@@ -96,6 +96,11 @@ class ActiveResource {
 	var $request_body = '';
 
 	/**
+	 * The request headers that was sent to the server.
+	 */
+	var $request_headers = array ();
+
+	/**
 	 * The complete URL that the request was sent to.
 	 */
 	var $request_uri = '';
@@ -519,16 +524,18 @@ class ActiveResource {
 			}
 			$params .= '</' . $el . '>';
 		}
-		if ($this->extra_params !== false)
-		{
+
+		if ($this->extra_params !== false) {
 			$url = $url . $this->extra_params;
 		}
+
 		$this->request_body = $params;
 		$this->request_uri = $url;
 		$this->request_method = $method;
+
 		$res = $this->_fetch ($url, $method, $params);
-		if ($res === false)
-		{
+
+		if ($res === false) {
 			return $this;
 		}
 
@@ -615,13 +622,12 @@ class ActiveResource {
 		}
 
 		if ($this->request_format == 'xml') {
-			curl_setopt ($ch, CURLOPT_HTTPHEADER, array ("Expect:", "Content-Type: text/xml", "Length: " . strlen ($params)));
+			$this->request_headers = array_merge ($this->request_headers, array ("Expect:", "Content-Type: text/xml", "Length: " . strlen ($params)));
 		}
 		switch ($method) {
 			case 'POST':
 				curl_setopt ($ch, CURLOPT_POST, 1);
 				curl_setopt ($ch, CURLOPT_POSTFIELDS, $params);
-				//curl_setopt ($ch, CURLOPT_HTTPHEADER, array ("Content-Type: application/x-www-form-urlencoded\n"));
 				break;
 			case 'DELETE':
 				curl_setopt ($ch, CURLOPT_CUSTOMREQUEST, 'DELETE');
@@ -629,12 +635,16 @@ class ActiveResource {
 			case 'PUT':
 				curl_setopt ($ch, CURLOPT_CUSTOMREQUEST, 'PUT');
 				curl_setopt ($ch, CURLOPT_POSTFIELDS, $params);
-				//curl_setopt ($ch, CURLOPT_HTTPHEADER, array ("Content-Type: application/x-www-form-urlencoded\n"));
 				break;
 			case 'GET':
 			default:
 				break;
 		}
+
+		if (count ($this->request_headers)) {
+			curl_setopt ($ch, CURLOPT_HTTPHEADER, $this->request_headers);
+		}
+
 		$res = curl_exec ($ch);
 
 		// Check HTTP status code for denied access
@@ -652,6 +662,7 @@ class ActiveResource {
 			curl_close ($ch);
 			return false;
 		}
+
 		curl_close ($ch);
 		return $res;
 	}
