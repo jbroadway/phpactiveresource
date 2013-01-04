@@ -62,7 +62,7 @@ class Song extends ActiveResource {
 
 h2. Extra Http Headers
 
-If you need to add extra http request headers you can set 
+If you need to add extra http request headers you can set $request_headers
 
 <pre>
 <?php
