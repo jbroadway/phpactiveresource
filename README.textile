@@ -59,3 +59,19 @@ class Song extends ActiveResource {
     var $extra_params = '?key=123456789';
 }
 </pre>
+
+h2. Extra Http Headers
+
+If you need to add extra http request headers you can set 
+
+<pre>
+<?php
+
+require_once ('ActiveResource.php');
+
+class Song extends ActiveResource {
+    var $site = 'http://localhost:3000/';
+    var $element_name = 'songs';
+    var $request_headers = array("x-api-key: some-api-key-here");
+}
+</pre>
