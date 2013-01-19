@@ -647,11 +647,24 @@ class ActiveResource {
 
 		$res = curl_exec ($ch);
 
-		// Check HTTP status code for denied access
 		$http_code = curl_getinfo ($ch, CURLINFO_HTTP_CODE);
+
+		// Check HTTP status code for denied access
 		if ($http_code == 401) {
 			$this->errno = $http_code;
 			$this->error = "HTTP Basic: Access denied.";
+			curl_close ($ch);
+			return false;
+		}
+
+		// Check HTTP status code for rate limit
+		if ($http_code == 429) {
+			if (preg_match ('/Retry-After: ([0-9]+)/', $res, $retry_after)) {
+			  sleep(intval($retry_after[1]));
+			  return $this->_fetch ($url, $method, $params);
+			}
+			$this->errno = $http_code;
+			$this->error = "Too Many Requests";
 			curl_close ($ch);
 			return false;
 		}
