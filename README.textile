@@ -9,6 +9,39 @@ Note:  You will need the php curl extension installed on your system. On Ubuntu,
 
 h2. Usage
 
+h3. With Composer
+
+Create a composer.json file with the following:
+
+<pre>
+{
+	"require": {
+		"phpactiveresource/phpactiveresource": "dev-master"
+	}
+}
+</pre>
+
+Now load the script via Composer's autoloader:
+
+<pre>
+<?php
+
+require_once 'vendor/autoload.php';
+
+use ActiveResource\ActiveResource;
+
+class Song extends ActiveResource {
+	public $site = 'http://localhost:3000/';
+	public $element_name = 'songs';
+}
+
+// etc.
+
+?>
+</pre>
+
+h3. Without Composer
+
 <pre>
 <?php
 
