@@ -1,5 +1,9 @@
 <?php
 
+namespace ActiveResource;
+
+use SimpleXMLElement;
+
 /**
  * Basic implementation of the Ruby on Rails ActiveResource REST client.
  * Intended to work with RoR-based REST servers, which all share similar
@@ -12,8 +16,8 @@
  *     require_once ('ActiveResource.php');
  *     
  *     class Song extends ActiveResource {
- *         var $site = 'http://localhost:3000/';
- *         var $element_name = 'songs';
+ *         public $site = 'http://localhost:3000/';
+ *         public $element_name = 'songs';
  *     }
  *     
  *     // create new item
@@ -48,92 +52,92 @@ class ActiveResource {
 	/**
 	 * The REST site address, e.g., http://user:pass@domain:port/
 	 */
-	var $site = false;
+	public $site = false;
 
 	/**
 	 * Add any extra params to the end of the url eg: API key
 	 */
-	var $extra_params = false;
+	public $extra_params = false;
 
 	/**
 	 * HTTP Basic Authentication user
 	 */
-	var $user = null;
+	public $user = null;
 
 	/**
 	 * HTTP Basic Authentication password
 	 */	
-	var $password = null;
+	public $password = null;
 	
 	/**
 	 * The remote collection, e.g., person or thing
 	 */
-	var $element_name = false;
+	public $element_name = false;
 
 	/**
 	 * Pleural form of the element name, e.g., people or things
 	 */
-	var $element_name_plural = '';
+	public $element_name_plural = '';
 
 	/**
 	 * The data of the current object, accessed via the anonymous get/set methods.
 	 */
-	var $_data = array ();
+	private $_data = array ();
 
 	/**
 	 * An error message if an error occurred.
 	 */
-	var $error = false;
+	public $error = false;
 
 	/**
 	 * The error number if an error occurred.
 	 */
-	var $errno = false;
+	public $errno = false;
 
 	/**
 	 * The request that was sent to the server.
 	 */
-	var $request_body = '';
+	public $request_body = '';
 
 	/**
 	 * The request headers that was sent to the server.
 	 */
-	var $request_headers = array ();
+	public $request_headers = array ();
 
 	/**
 	 * The complete URL that the request was sent to.
 	 */
-	var $request_uri = '';
+	public $request_uri = '';
 
 	/**
 	 * The request method sent to the server.
 	 */
-	var $request_method = '';
+	public $request_method = '';
 
 	/**
 	 * The response code returned from the server.
 	 */
-	var $response_code = false;
+	public $response_code = false;
 
 	/**
 	 * The raw response headers sent from the server.
 	 */
-	var $response_headers = '';
+	public $response_headers = '';
 
 	/**
 	 * The response body sent from the server.
 	 */
-	var $response_body = '';
+	public $response_body = '';
 
 	/**
 	 * The format requests should use to send data (url or xml).
 	 */
-	var $request_format = 'url';
+	public $request_format = 'url';
 
 	/**
 	 * Corrections to improper pleuralizations.
 	 */
-	var $pleural_corrections = array (
+	public $pleural_corrections = array (
 		'persons' => 'people',
 		'peoples' => 'people',
 		'mans' => 'men',
@@ -159,7 +163,7 @@ class ActiveResource {
 	/**
 	 * Constructor method.
 	 */
-	function __construct ($data = array ()) {
+	public function __construct ($data = array ()) {
 		$this->_data = $data;
 		// Allow class-defined element name or use class name if not defined
 		$this->element_name = $this->element_name ? $this->element_name : strtolower (get_class ($this));
@@ -185,7 +189,7 @@ class ActiveResource {
 	/**
 	 * Pluralize the element name.
 	 */
-	function pluralize ($word) {
+	public function pluralize ($word) {
 		$word .= 's';
 		$word = preg_replace ('/(x|ch|sh|ss])s$/', '\1es', $word);
 		$word = preg_replace ('/ss$/', 'ses', $word);
@@ -203,7 +207,7 @@ class ActiveResource {
 	/**
 	 * For backwards-compatibility.
 	 */
-	function pleuralize ($word) {
+	public function pleuralize ($word) {
 		return $this->pluralize ($word);
 	}
 
@@ -213,7 +217,7 @@ class ActiveResource {
 	 *     POST /collection.xml
 	 *     PUT  /collection/id.xml
 	 */
-	function save () {
+	public function save () {
 		if (isset ($this->_data['id'])) {
 			return $this->_send_and_receive ($this->site . $this->element_name_plural . '/' . $this->_data['id'] . '.xml', 'PUT', $this->_data); // update
 		}
@@ -225,7 +229,7 @@ class ActiveResource {
 	 *
 	 *     DELETE /collection/id.xml
 	 */
-	function destroy () {
+	public function destroy () {
 		return $this->_send_and_receive ($this->site . $this->element_name_plural . '/' . $this->_data['id'] . '.xml', 'DELETE');
 	}
 
@@ -235,7 +239,7 @@ class ActiveResource {
 	 *     GET /collection/id.xml
 	 *     GET /collection.xml
 	 */
-	function find ($id = false, $options = array ()) {
+	public function find ($id = false, $options = array ()) {
 		if (! $id) {
 			$id = $this->_data['id'];
 		}
@@ -256,7 +260,7 @@ class ActiveResource {
 	 *     GET /collection/id/method.xml
 	 *     GET /collection/id/method.xml?attr=value
 	 */
-	function get ($method, $options = array ()) {
+	public function get ($method, $options = array ()) {
 		$req = $this->site . $this->element_name_plural;
         if (isset ($this->_data['id']) && $this->_data['id']) { 
           $req .= '/' . $this->_data['id'];
@@ -273,7 +277,7 @@ class ActiveResource {
 	 *
 	 *     POST /collection/id/method.xml
 	 */
-	function post ($method, $options = array (), $start_tag = false) {
+	public function post ($method, $options = array (), $start_tag = false) {
 		$req = $this->site . $this->element_name_plural;
         if ($this->_data['id']) {
           $req .= '/' . $this->_data['id'];
@@ -287,7 +291,7 @@ class ActiveResource {
 	 *
 	 *     PUT /collection/id/method.xml
 	 */
-	function put ($method, $options = array (), $options_as_xml = false, $start_tag = false) {
+	public function put ($method, $options = array (), $options_as_xml = false, $start_tag = false) {
 		$req = $this->site . $this->element_name_plural;
         if ($this->_data['id']) { 
         	$req .= '/' . $this->_data['id'];
@@ -305,7 +309,7 @@ class ActiveResource {
 	/**
 	 * Simple recursive function to build an XML response.
 	 */
-	function _build_xml ($k, $v) {
+	public function _build_xml ($k, $v) {
 		if (is_object ($v) && strtolower (get_class ($v)) == 'simplexmlelement') {
 			return preg_replace ('/<\?xml(.*?)\?>\n*/', '', $v->asXML ());
 		}
@@ -365,7 +369,7 @@ class ActiveResource {
 	 * @author Dom Hastings - modified to suit my needs
 	 * @see http://www.php.net/manual/en/function.ord.php#78032
 	 */
-	function _unicode_ord (&$c, &$i = 0) {
+	public function _unicode_ord (&$c, &$i = 0) {
 		// get the character length
 		$l = strlen($c);
 		// copy the offset
@@ -417,7 +421,7 @@ class ActiveResource {
 	 * @author Dom Hastings
 	 * @see http://www.w3.org/TR/REC-xml/#sec-predefined-ent
 	 */
-	function _xml_entities ($s, $hex = true) {
+	public function _xml_entities ($s, $hex = true) {
 		// if the string is empty
 		if (empty($s)) {
 			// just return it
@@ -504,7 +508,7 @@ class ActiveResource {
 	/**
 	 * Build the request, call _fetch() and parse the results.
 	 */
-	function _send_and_receive ($url, $method, $data = array (), $start_tag = false) {
+	public function _send_and_receive ($url, $method, $data = array (), $start_tag = false) {
 		$params = '';
 		$el = $start_tag ? $start_tag : $this->element_name; // Singular this time
 		if ($this->request_format == 'url') {
@@ -599,7 +603,7 @@ class ActiveResource {
 	/**
 	 * Fetch the specified request via cURL.
 	 */
-	function _fetch ($url, $method, $params) {
+	public function _fetch ($url, $method, $params) {
 		if (! extension_loaded ('curl')) {
 			$this->error = 'cURL extension not loaded.';
 			return false;
@@ -683,7 +687,7 @@ class ActiveResource {
 	/**
 	 * Getter for internal object data.
 	 */
-	function __get ($k) {
+	public function __get ($k) {
 		if (isset ($this->_data[$k])) {
 			return $this->_data[$k];
 		}
@@ -693,7 +697,7 @@ class ActiveResource {
 	/**
 	 * Setter for internal object data.
 	 */
-	function __set ($k, $v) {
+	public function __set ($k, $v) {
 		if (isset ($this->_data[$k])) {
 			$this->_data[$k] = $v;
 			return;
@@ -704,7 +708,7 @@ class ActiveResource {
 	/**
 	 * Quick setter for chaining methods.
 	 */
-	function set ($k, $v = false) {
+	public function set ($k, $v = false) {
 		if (! $v && is_array ($k)) {
 			foreach ($k as $key => $value) {
 				$this->_data[$key] = $value;

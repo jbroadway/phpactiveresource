@@ -1,7 +1,5 @@
 <?php
 
-require_once ('ActiveResource.php');
-
 class Test extends ActiveResource {
 }
 

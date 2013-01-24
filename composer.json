@@ -3,8 +3,8 @@
 	"type": "library",
 	"description": "A PHP client library for easily accessing Ruby on Rails-based REST services.",
 	"keywords": ["activeresource","rails","ruby","ruby on rails","rest"],
-	"homepage": "https://github.com/lux/phpactiveresource",
-	"license": "LGPL",
+	"homepage": "https://github.com/jbroadway/phpactiveresource",
+	"license": "MIT",
 	"authors": [
 		{
 			"name": "Johnny Broadway",
@@ -13,6 +13,11 @@
 		}
 	],
 	"require": {
-		"php": ">=5.3.0"
+		"php": ">=5.3.6"
+	},
+	"autoload": {
+		"psr-0": {
+			"ActiveResource": "lib/"
+		}
 	}
 }
