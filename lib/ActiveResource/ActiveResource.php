@@ -248,12 +248,13 @@ class ActiveResource {
 			$options_string = '?' . http_build_query ($options);
 		}
 		if ($id == 'all' || $id == false) {
+			// URL/plural.xml?someparam=1
 			$url = $this->site . $this->element_name_plural . '.xml';
 			return $this->_send_and_receive ($url . $options_string, 'GET');
-        }
+		}
 
-        // URL/plural.xml?someparam=1
-        return $this->_send_and_receive ($this->site . $this->element_name_plural . '/' . $id . '.xml' . $options_string, 'GET');
+		// URL/plural/id.xml?someparam=1
+		return $this->_send_and_receive ($this->site . $this->element_name_plural . '/' . $id . '.xml' . $options_string, 'GET');
 	}
 
 	/**
