@@ -250,8 +250,15 @@ class ActiveResource {
 		if ($id == 'all') {
 			$url = $this->site . $this->element_name_plural . '.xml';
 			return $this->_send_and_receive ($url . $options_string, 'GET');
-		}
-		return $this->_send_and_receive ($this->site . $this->element_name_plural . '/' . $id . '.xml' . $options_string, 'GET');
+        }
+
+        // URL/plural.xml?someparam=1
+        if (! $id) {
+             return $this->_send_and_receive ($this->site . $this->element_name_plural . '.xml' . $options_string, 'GET');
+         }
+         else {
+             return $this->_send_and_receive ($this->site . $this->element_name_plural . '/' . $id . '.xml' . $options_string, 'GET');
+         }
 	}
 
 	/**
