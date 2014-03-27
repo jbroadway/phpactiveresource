@@ -282,7 +282,7 @@ class ActiveResource {
 	 */
 	public function post ($method, $options = array (), $start_tag = false) {
 		$req = $this->site . $this->element_name_plural;
-        if ($this->_data['id']) {
+        if (isset ($this->_data['id']) && $this->_data['id']) {
           $req .= '/' . $this->_data['id'];
         }
         $req .= '/' . $method . '.xml';
@@ -296,7 +296,7 @@ class ActiveResource {
 	 */
 	public function put ($method, $options = array (), $options_as_xml = false, $start_tag = false) {
 		$req = $this->site . $this->element_name_plural;
-        if ($this->_data['id']) { 
+        if (isset ($this->_data['id']) && $this->_data['id']) { 
         	$req .= '/' . $this->_data['id'];
         }
         $req .= '/' . $method . '.xml';
